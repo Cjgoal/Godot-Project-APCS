@@ -68,6 +68,10 @@ const RIGHT_HAND_PATH := "res://addons/godot-xr-tools/hands/scenes/lowpoly/right
 ## Hand to use for editor preview
 var _editor_preview_hand : XRToolsHand
 
+## to ensure that the player uses both hands for a special type of object
+var left_hand_grabbing = false
+var right_hand_grabbing = false
+
 
 ## Called when the node enters the scene tree for the first time.
 func _ready():
@@ -89,6 +93,12 @@ func can_grab(grabber : Node3D, current : XRToolsGrabPoint) -> float:
 	# Fail if the hand grab is not permitted
 	if not _is_valid_hand_grab(current):
 		return 0.0
+		
+	# Update grabbing state for each hand
+	if hand == Hand.LEFT:
+		left_hand_grabbing = true
+	elif hand == Hand.RIGHT:
+		right_hand_grabbing = true
 
 	# Get the distance-weighted fitness in the range (0.0 - 0.5], but boost
 	# to [0.5 - 1.0] for valid "specific" grabs.
@@ -211,3 +221,9 @@ static func _get_grabber_controller(grabber : Node3D) -> XRController3D:
 
 	# Get the controller associated with the pickup
 	return pickup.get_controller()
+	
+func release_grab() -> void:
+	if hand == Hand.LEFT:
+		left_hand_grabbing = false
+	elif hand == Hand.RIGHT:
+		right_hand_grabbing = false
